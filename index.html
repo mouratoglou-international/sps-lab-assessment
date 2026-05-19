@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TPS LAB | オンライン パフォーマンス アセスメント</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0D1B3E;--navy-mid:#152348;--navy-light:#1E3060;--yg:#C8E63A;--yg-dark:#9BB22A;--yg-pale:#EAF5A0;--off:#F4F5F0;--muted:#7A8399;--border:rgba(200,230,58,0.2);--borderw:rgba(255,255,255,0.07);}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--off);font-family:'Noto Sans JP',sans-serif;font-weight:300;line-height:1.8;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,230,58,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(200,230,58,.025) 1px,transparent 1px);background-size:64px 64px;pointer-events:none;z-index:0;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.1rem 3rem;background:rgba(13,27,62,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--borderw);}
+.nbrand{display:flex;align-items:center;gap:10px;}
+.nball{width:30px;height:30px;background:var(--yg);border-radius:50%;position:relative;flex-shrink:0;}
+.nball::after{content:'';position:absolute;width:16px;height:1.5px;background:var(--navy);top:50%;left:50%;transform:translate(-50%,-50%) rotate(-28deg);border-radius:2px;}
+.nball::before{content:'';position:absolute;width:8px;height:8px;background:var(--navy);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);}
+.btext{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.12em;}
+.bsub{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.2em;color:var(--yg);display:block;margin-top:-2px;}
+.nav-logo-img{height:38px;width:auto;display:block;}
+.foot-logo-img{height:32px;width:auto;display:block;}
+.nlinks{display:flex;gap:2rem;align-items:center;}
+.nlinks a{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.nlinks a:hover{color:var(--yg);}
+.ncta{background:var(--yg);color:var(--navy);font-family:'DM Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:.55rem 1.4rem;border:none;cursor:pointer;text-decoration:none;transition:background .2s;}
+.ncta:hover{background:var(--yg-pale);}
+section{position:relative;z-index:1;padding:6rem 3rem;}
+.tag{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.25em;color:var(--yg);text-transform:uppercase;margin-bottom:.8rem;display:flex;align-items:center;gap:.75rem;}
+.tag::before{content:'';width:28px;height:1px;background:var(--yg);}
+h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.2rem,5vw,3.8rem);letter-spacing:.04em;line-height:1.05;margin-bottom:1.5rem;font-weight:400;}
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:8rem 3rem 5rem;}
+.heye{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.25em;color:var(--yg);text-transform:uppercase;margin-bottom:1.8rem;display:flex;align-items:center;gap:1rem;animation:fu .6s ease both;}
+.heye::before{content:'';width:36px;height:1px;background:var(--yg);}
+.hh1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,6vw,5rem);line-height:1.05;letter-spacing:.02em;margin-bottom:2rem;animation:fu .6s ease .1s both;}
+.hh1 .yg{color:var(--yg);}
+.hlead{font-size:.98rem;color:rgba(244,245,240,.68);max-width:500px;line-height:2;margin-bottom:3rem;animation:fu .6s ease .2s both;}
+.hbtns{display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;animation:fu .6s ease .3s both;}
+.btnp{background:var(--yg);color:var(--navy);font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:.95rem 2.4rem;border:none;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;}
+.btnp:hover{background:var(--yg-pale);transform:translateY(-2px);}
+.btng{background:transparent;color:var(--off);font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-decoration:none;opacity:.65;transition:opacity .2s;}
+.btng:hover{opacity:1;}
+.hscroll{position:absolute;bottom:2.5rem;left:3rem;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--muted);display:flex;align-items:center;gap:.75rem;}
+.sbar{width:36px;height:1px;background:var(--muted);overflow:hidden;position:relative;}
+.sbar::after{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:var(--yg);animation:sl 2s ease-in-out infinite;}
+@keyframes sl{0%{left:-100%}50%{left:0}100%{left:100%}}
+.hstat{position:absolute;right:3rem;bottom:3rem;display:flex;flex-direction:column;align-items:flex-end;gap:.8rem;}
+.stitem{text-align:right;}
+.stnum{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--yg);line-height:1;}
+.stlbl{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;}
+/* CREDS */
+.creds{background:var(--navy-mid);border-top:1px solid var(--borderw);border-bottom:1px solid var(--borderw);padding:0 3rem;z-index:1;position:relative;}
+.credsrow{display:flex;}
+.cred{flex:1;padding:1.8rem 1.5rem;border-right:1px solid var(--borderw);}
+.cred:last-child{border-right:none;}
+.credl{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.2em;color:var(--yg);text-transform:uppercase;margin-bottom:.35rem;}
+.credv{font-size:.85rem;font-weight:400;line-height:1.5;}
+/* WHY */
+.whywrap{display:grid;grid-template-columns:1.1fr 1fr;gap:5rem;align-items:start;margin-top:3rem;}
+.whytxt p{color:rgba(244,245,240,.68);margin-bottom:1.2rem;font-size:.92rem;}
+.whytxt strong{color:var(--off);font-weight:500;}
+.qbox{border:1px solid var(--border);padding:2rem;position:relative;margin-top:2rem;}
+.qbox::before{content:'"';position:absolute;top:-.6rem;left:1.5rem;font-family:'Bebas Neue',sans-serif;font-size:4rem;color:var(--yg);line-height:1;background:var(--navy);padding:0 .3rem;}
+.qtxt{font-size:.95rem;line-height:1.9;font-weight:400;margin-bottom:.75rem;}
+.qby{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--yg);text-transform:uppercase;}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--borderw);}
+.ccard{background:var(--navy);padding:1.5rem;}
+.cicon{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--yg);line-height:1;margin-bottom:.4rem;}
+.ctit{font-size:.83rem;font-weight:500;margin-bottom:.3rem;}
+.cdesc{font-size:.78rem;color:var(--muted);line-height:1.7;}
+/* QUIZ */
+.qzwrap{max-width:700px;margin:3rem auto 0;border:1px solid var(--border);}
+.qztop{background:rgba(200,230,58,.06);border-bottom:1px solid var(--border);padding:1.2rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+.qzttl{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--yg);text-transform:uppercase;}
+.qdots{display:flex;gap:4px;}
+.dot{width:22px;height:3px;background:var(--borderw);transition:background .3s;}
+.dot.on{background:var(--yg);}
+.qzbody{padding:2rem;}
+.qtext{font-size:1rem;font-weight:400;margin-bottom:1.5rem;line-height:1.85;}
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.qopt{border:1px solid var(--borderw);padding:.85rem 1rem;cursor:pointer;font-size:.82rem;font-weight:300;text-align:left;background:transparent;color:var(--off);transition:all .2s;font-family:'Noto Sans JP',sans-serif;line-height:1.5;}
+.qopt:hover{border-color:var(--yg);background:rgba(200,230,58,.05);}
+.qopt.sel{border-color:var(--yg);background:rgba(200,230,58,.1);color:var(--yg-pale);}
+.qznav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--borderw);}
+.qback{background:transparent;border:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;}
+.qnext{background:var(--yg);color:var(--navy);border:none;padding:.65rem 1.6rem;font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+.qnext:disabled{opacity:.3;cursor:default;}
+.qnext:not(:disabled):hover{background:var(--yg-pale);}
+.qres{display:none;padding:2.5rem 2rem;text-align:center;}
+.reslbl{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--yg);text-transform:uppercase;margin-bottom:.4rem;}
+.restype{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;line-height:1.1;margin-bottom:1rem;}
+.resdesc{font-size:.85rem;color:rgba(244,245,240,.7);line-height:1.85;max-width:460px;margin:0 auto 1.8rem;}
+.rescta{background:var(--yg);color:var(--navy);border:none;padding:.9rem 2.2rem;font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:background .2s;}
+.rescta:hover{background:var(--yg-pale);}
+/* GUIDE */
+.guide{background:var(--navy-mid);border-top:1px solid var(--borderw);border-bottom:1px solid var(--borderw);}
+.gleadp{color:rgba(244,245,240,.65);font-size:.9rem;max-width:520px;margin-bottom:3rem;}
+.camgrid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2.5rem;}
+.camcard{border:1px solid var(--border);}
+.camhead{background:rgba(200,230,58,.07);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+.camn{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--yg);line-height:1;min-width:2rem;}
+.camttl{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;}
+.camsub{font-size:.75rem;color:var(--muted);}
+.camviz{padding:2rem;display:flex;justify-content:center;align-items:center;min-height:180px;}
+.camspecs{padding:1rem 1.5rem;border-top:1px solid var(--borderw);display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.sp{display:flex;flex-direction:column;gap:2px;}
+.spl{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;}
+.spv{font-size:.8rem;font-weight:400;}
+.chklist{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--borderw);}
+.chi{background:var(--navy-mid);padding:1.1rem 1.3rem;display:flex;gap:.7rem;align-items:flex-start;}
+.chmark{width:16px;height:16px;min-width:16px;border:1px solid var(--yg);display:flex;align-items:center;justify-content:center;margin-top:3px;font-size:.65rem;color:var(--yg);}
+.cht{font-size:.78rem;color:rgba(244,245,240,.72);line-height:1.55;}
+/* FLOW */
+.fsteps{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--borderw);margin-top:3rem;}
+.fstep{padding:2rem 1.5rem;border-right:1px solid var(--borderw);position:relative;}
+.fstep:last-child{border-right:none;}
+.fn{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;color:rgba(200,230,58,.12);margin-bottom:.8rem;}
+.fttl{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--yg);margin-bottom:.4rem;}
+.fdesc{font-size:.78rem;color:var(--muted);line-height:1.7;}
+.farr{position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--navy);border:1px solid var(--yg);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--yg);z-index:2;}
+/* COACH */
+.coachsec{background:linear-gradient(135deg,var(--navy-light) 0%,var(--navy) 100%);border-top:2px solid var(--yg);border-bottom:1px solid var(--borderw);}
+.coachin{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
+.cbadge{display:inline-flex;align-items:center;gap:.6rem;background:rgba(200,230,58,.1);border:1px solid var(--border);padding:.4rem 1rem;margin-bottom:1.5rem;}
+.cbadge span{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;color:var(--yg);text-transform:uppercase;}
+.coachtxt p{color:rgba(244,245,240,.68);font-size:.92rem;margin-bottom:1.2rem;}
+.coachtxt strong{color:var(--off);font-weight:500;}
+.campcards{display:flex;flex-direction:column;gap:1rem;}
+.campcard{border:1px solid var(--border);padding:1.5rem;position:relative;overflow:hidden;transition:border-color .2s;}
+.campcard:hover{border-color:rgba(200,230,58,.5);}
+.campcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--yg);}
+.camptag{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.18em;color:var(--yg);text-transform:uppercase;margin-bottom:.4rem;}
+.camptit{font-size:.95rem;font-weight:500;margin-bottom:.4rem;}
+.campdesc{font-size:.78rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;}
+.campmeta{display:flex;gap:1.5rem;}
+.campm{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;color:rgba(244,245,240,.5);}
+.campm span{color:var(--off);font-weight:500;}
+.cctabox{margin-top:2rem;border:1px solid var(--border);padding:1.5rem;}
+.cctabox p{font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.7;}
+.btnout{background:transparent;border:1px solid var(--yg);color:var(--yg);font-family:'DM Mono',monospace;font-size:.72rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;padding:.7rem 1.6rem;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;}
+.btnout:hover{background:var(--yg);color:var(--navy);}
+/* FORM */
+.formsec{background:var(--navy-mid);border-top:1px solid var(--borderw);}
+.formwrap{display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start;}
+.fintro p{color:rgba(244,245,240,.65);font-size:.9rem;line-height:1.9;margin-bottom:1.5rem;}
+.pricebox{border:1px solid var(--border);padding:1.5rem;margin-top:1.5rem;}
+.pttl{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;color:var(--yg);text-transform:uppercase;margin-bottom:1rem;}
+.prow{display:flex;justify-content:space-between;align-items:baseline;padding:.55rem 0;border-bottom:1px solid var(--borderw);font-size:.83rem;}
+.prow:last-child{border-bottom:none;}
+.plbl{color:var(--muted);}
+.pval{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--yg);}
+.fbox{border:1px solid var(--border);padding:2.5rem;}
+.fg{margin-bottom:1.4rem;}
+label{display:block;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem;}
+input[type=text],input[type=email],input[type=tel],select,textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:var(--off);padding:.72rem .95rem;font-family:'Noto Sans JP',sans-serif;font-size:.85rem;font-weight:300;outline:none;transition:border-color .2s;appearance:none;border-radius:0;}
+input:focus,select:focus,textarea:focus{border-color:var(--yg);background:rgba(200,230,58,.04);}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23C8E63A' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;}
+select option{background:var(--navy-mid);}
+textarea{resize:vertical;min-height:90px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.radiog{display:flex;flex-direction:column;gap:.4rem;}
+.ritem{display:flex;align-items:center;gap:.7rem;cursor:pointer;padding:.5rem .7rem;border:1px solid transparent;transition:border-color .2s;}
+.ritem:hover{border-color:var(--border);}
+.ritem input[type=radio]{width:13px;height:13px;min-width:13px;appearance:none;border:1px solid var(--muted);border-radius:50%;position:relative;cursor:pointer;background:transparent;padding:0;transition:border-color .2s;}
+.ritem input[type=radio]:checked{border-color:var(--yg);}
+.ritem input[type=radio]:checked::after{content:'';position:absolute;width:5px;height:5px;background:var(--yg);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);}
+.rlbl{font-size:.82rem;font-weight:300;font-family:'Noto Sans JP',sans-serif;letter-spacing:0;text-transform:none;color:var(--off);margin:0;cursor:pointer;}
+.subbtn{width:100%;background:var(--yg);color:var(--navy);border:none;padding:1.05rem;font-family:'DM Mono',monospace;font-size:.82rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:.5rem;}
+.subbtn:hover{background:var(--yg-pale);}
+.fnote{font-size:.7rem;color:var(--muted);text-align:center;margin-top:.9rem;line-height:1.6;}
+.sucmsg{display:none;padding:2rem;text-align:center;}
+.sucmsg .sico{font-size:2rem;color:var(--yg);margin-bottom:.5rem;}
+.sucmsg p{color:rgba(244,245,240,.72);font-size:.85rem;line-height:1.8;}
+/* BRIDGE */
+.bridge{border-top:2px solid rgba(200,230,58,.15);}
+.bridgein{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:3rem;}
+.bcard{border:1px solid var(--borderw);padding:2.5rem;position:relative;overflow:hidden;transition:border-color .3s;}
+.bcard:hover{border-color:var(--border);}
+.bcard.feat{border-color:var(--border);}
+.bcard.feat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--yg);}
+.btag{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--yg);text-transform:uppercase;margin-bottom:.8rem;}
+.bh{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.04em;line-height:1.1;margin-bottom:1rem;}
+.bp{font-size:.82rem;color:var(--muted);line-height:1.75;margin-bottom:1.5rem;}
+.blist{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem;}
+.blist li{font-size:.8rem;color:rgba(244,245,240,.72);display:flex;align-items:flex-start;gap:.6rem;line-height:1.5;}
+.blist li::before{content:'→';color:var(--yg);font-size:.7rem;margin-top:.1rem;flex-shrink:0;}
+.blink{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:var(--yg);text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:gap .2s;}
+.blink:hover{gap:.8rem;}
+/* FOOTER */
+footer{border-top:1px solid var(--borderw);padding:2.5rem 3rem;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;}
+.fcopy{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;color:var(--muted);}
+.flinks{display:flex;gap:2rem;}
+.flinks a{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .2s;}
+.flinks a:hover{color:var(--yg);}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){nav{padding:1rem 1.5rem;}.nlinks{display:none;}section{padding:4rem 1.5rem;}.hero{padding:6rem 1.5rem 4rem;}.whywrap,.formwrap,.coachin,.bridgein{grid-template-columns:1fr;gap:2.5rem;}.fsteps{grid-template-columns:1fr 1fr;}.camgrid,.chklist{grid-template-columns:1fr;}.cgrid{grid-template-columns:1fr;}.hstat{display:none;}.credsrow{flex-wrap:wrap;}.cred{flex:0 0 50%;border-bottom:1px solid var(--borderw);border-right:none;}footer{flex-direction:column;gap:1rem;text-align:center;}.flinks{flex-wrap:wrap;justify-content:center;}.qopts{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nbrand">
+    <a href="#top"><img src="assets/logo.png" alt="Sport Performance Science LAB" class="nav-logo-img"></a>
+  </div>
+  <div class="nlinks">
+    <a href="#why">メソッド</a>
+    <a href="#guide">撮影ガイド</a>
+    <a href="#coach">コーチ向け</a>
+    <a href="#assessment-form">診断申込</a>
+  </div>
+  <a href="#assessment-form" class="ncta">無料相談を申し込む</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="heye">Online Performance Assessment — Japan</div>
+  <h1 class="hh1">今のあなたのテニスは、<br><span class="yg">身体が本来持つ能力を</span><br>十分に引き出せていません。</h1>
+  <p class="hlead">人間としての身体の可能性を最大限に解き放ち、新たな自分へと進化させましょう。<br>機能解剖学に基づく2軸動画解析で、あなただけが持つ身体動作の個性や、進歩を妨げている壁を科学的に診断し、正しい法則へと導きます。</p>
+  <div class="hbtns">
+    <a href="#quiz" class="btnp">まず3問で自己診断する</a>
+    <a href="#why" class="btng">なぜ「身体のロック」なのか ↓</a>
+  </div>
+  <div class="hscroll"><div class="sbar"></div>SCROLL</div>
+  <div class="hstat">
+    <div class="stitem"><div class="stnum">ATP</div><div class="stlbl">200+ 指導実績</div></div>
+    <div class="stitem"><div class="stnum">30+</div><div class="stlbl">Years · Mouratoglou</div></div>
+  </div>
+</section>
+
+<!-- CREDS -->
+<div class="creds">
+  <div class="credsrow">
+    <div class="cred"><div class="credl">Director</div><div class="credv">Chief Performance Scientist<br>Mouratoglou Academy</div></div>
+    <div class="cred"><div class="credl">Expertise</div><div class="credv">機能解剖学 / 動作解析<br>スポーツパフォーマンス科学</div></div>
+    <div class="cred"><div class="credl">Track Record</div><div class="credv">ATP Top 200+ 選手への指導<br>APAC 地域担当</div></div>
+    <div class="cred"><div class="credl">Method</div><div class="credv">Mouratoglou International<br>認定メソッド準拠</div></div>
+  </div>
+</div>
+
+<!-- WHY -->
+<section id="why">
+  <div class="tag">The Science</div>
+  <h2>なぜ「フォーム」より<br>「身体のロック」なのか</h2>
+  <div class="whywrap">
+    <div class="whytxt">
+      <p>多くのコーチングは<strong>「どう打つか（技術）」</strong>にフォーカスします。しかし、選手が改善しない本当の理由は、フォームではなく<strong>身体の特定部位が本来の動きを「ロック」していること</strong>にあります。</p>
+      <p>機能解剖学の観点から見ると、胸椎の回旋制限、股関節の可動域不足、足関節のモビリティ欠如——これらが連鎖的にパフォーマンスを制限しています。<strong>ロックを解除せずにフォームを修正しても、根本解決にはなりません。</strong></p>
+      <p>TPS LABでは、背面・側面の2軸動画から動作パターンを分析し、あなた固有のロックパターンを特定。その上で、最短経路でのパフォーマンス向上プランを提示します。</p>
+      <div class="qbox">
+        <p class="qtxt">「テニスは技術のスポーツではなく、身体と意思決定のスポーツ。動きの自由を取り戻すことが、すべての始まりです。」</p>
+        <div class="qby">— TPS LAB Director</div>
+      </div>
+    </div>
+    <div>
+      <div class="cgrid">
+        <div class="ccard"><div class="cicon">01</div><div class="ctit">動作スクリーニング</div><div class="cdesc">2軸動画から関節可動域・筋連鎖パターン・荷重特性を可視化</div></div>
+        <div class="ccard"><div class="cicon">02</div><div class="ctit">ロック特定</div><div class="cdesc">胸椎・股関節・足関節を中心に、制限の根本部位を特定</div></div>
+        <div class="ccard"><div class="cicon">03</div><div class="ctit">連鎖分析</div><div class="cdesc">運動連鎖の観点からロックが技術面へ与える影響を解説</div></div>
+        <div class="ccard"><div class="cicon">04</div><div class="ctit">個別プログラム</div><div class="cdesc">解除優先順位と具体的なエクササイズ処方をレポートで提供</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" style="background:var(--navy-mid);border-top:1px solid var(--borderw);border-bottom:1px solid var(--borderw);">
+  <div class="tag">Self Check</div>
+  <h2>3問でわかる<br>あなたのロックタイプ</h2>
+  <div class="qzwrap">
+    <div class="qztop">
+      <span class="qzttl">Quick Assessment</span>
+      <div class="qdots"><div class="dot on" id="d0"></div><div class="dot" id="d1"></div><div class="dot" id="d2"></div></div>
+    </div>
+    <div class="qzbody" id="qzbody">
+      <p class="qtext" id="qtext"></p>
+      <div class="qopts" id="qopts"></div>
+      <div class="qznav">
+        <button class="qback" id="qback" onclick="qBack()">← 戻る</button>
+        <button class="qnext" id="qnext" disabled onclick="qNext()">次へ →</button>
+      </div>
+    </div>
+    <div class="qres" id="qres">
+      <div class="reslbl">あなたのロックタイプ</div>
+      <div class="restype" id="restype"></div>
+      <p class="resdesc" id="resdesc"></p>
+      <a href="#assessment-form" class="rescta">詳細診断を申し込む →</a>
+    </div>
+  </div>
+</section>
+
+<!-- GUIDE -->
+<section class="guide" id="guide">
+  <div class="tag">Shooting Guide</div>
+  <h2>正しい2軸動画の<br>撮影方法</h2>
+  <p class="gleadp">診断精度を最大化するため、以下の仕様で撮影してください。背面・側面の2アングルが必須です。</p>
+  <div class="camgrid">
+    <div class="camcard">
+      <div class="camhead">
+        <div class="camn">01</div>
+        <div><div class="camttl">背面カメラ — Posterior View</div><div class="camsub">ベースライン後方に設置</div></div>
+      </div>
+      <div class="camviz">
+        <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" width="200">
+          <rect x="30" y="20" width="140" height="120" fill="none" stroke="rgba(200,230,58,0.25)" stroke-width="1"/>
+          <line x1="100" y1="20" x2="100" y2="140" stroke="rgba(200,230,58,0.25)" stroke-width="1"/>
+          <line x1="30" y1="80" x2="170" y2="80" stroke="rgba(200,230,58,0.6)" stroke-width="2"/>
+          <circle cx="100" cy="112" r="7" fill="none" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="100" y1="119" x2="100" y2="135" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="100" y1="125" x2="88" y2="132" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="100" y1="125" x2="113" y2="130" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="100" y1="135" x2="93" y2="145" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="100" y1="135" x2="107" y2="145" stroke="#C8E63A" stroke-width="1.5"/>
+          <rect x="84" y="4" width="32" height="20" rx="3" fill="none" stroke="#C8E63A" stroke-width="1.2"/>
+          <circle cx="100" cy="14" r="5" fill="none" stroke="#C8E63A" stroke-width="1"/>
+          <line x1="100" y1="24" x2="100" y2="96" stroke="rgba(200,230,58,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+          <polygon points="96,96 104,96 100,104" fill="rgba(200,230,58,0.35)"/>
+          <text x="100" y="157" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(200,230,58,0.5)" letter-spacing="1">BASELINE</text>
+        </svg>
+      </div>
+      <div class="camspecs">
+        <div class="sp"><div class="spl">位置</div><div class="spv">ベースライン後方 5〜6m</div></div>
+        <div class="sp"><div class="spl">高さ</div><div class="spv">腰の高さ（約90cm）</div></div>
+        <div class="sp"><div class="spl">フレーム</div><div class="spv">全身が収まること</div></div>
+        <div class="sp"><div class="spl">フォーカス</div><div class="spv">スプリットステップ〜打点</div></div>
+      </div>
+    </div>
+    <div class="camcard">
+      <div class="camhead">
+        <div class="camn">02</div>
+        <div><div class="camttl">側面カメラ — Lateral View</div><div class="camsub">サイドフェンス沿いに設置</div></div>
+      </div>
+      <div class="camviz">
+        <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" width="200">
+          <rect x="20" y="40" width="160" height="100" fill="none" stroke="rgba(200,230,58,0.2)" stroke-width="1"/>
+          <line x1="100" y1="40" x2="100" y2="140" stroke="rgba(200,230,58,0.6)" stroke-width="2"/>
+          <circle cx="140" cy="88" r="7" fill="none" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="140" y1="95" x2="140" y2="112" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="140" y1="102" x2="127" y2="109" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="140" y1="102" x2="153" y2="107" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="140" y1="112" x2="133" y2="122" stroke="#C8E63A" stroke-width="1.5"/>
+          <line x1="140" y1="112" x2="147" y2="122" stroke="#C8E63A" stroke-width="1.5"/>
+          <rect x="3" y="78" width="22" height="16" rx="2" fill="none" stroke="#C8E63A" stroke-width="1.2"/>
+          <circle cx="14" cy="86" r="4" fill="none" stroke="#C8E63A" stroke-width="1"/>
+          <line x1="25" y1="86" x2="110" y2="86" stroke="rgba(200,230,58,0.35)" stroke-width="1" stroke-dasharray="3,3"/>
+          <polygon points="110,82 118,86 110,90" fill="rgba(200,230,58,0.35)"/>
+          <text x="100" y="155" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(200,230,58,0.5)" letter-spacing="1">SIDE VIEW</text>
+        </svg>
+      </div>
+      <div class="camspecs">
+        <div class="sp"><div class="spl">位置</div><div class="spv">サイドライン外 3〜4m</div></div>
+        <div class="sp"><div class="spl">高さ</div><div class="spv">腰の高さ（約90cm）</div></div>
+        <div class="sp"><div class="spl">フレーム</div><div class="spv">全身＋ラケット軌道</div></div>
+        <div class="sp"><div class="spl">フォーカス</div><div class="spv">体幹回旋・膝の曲げ伸ばし</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="chklist">
+    <div class="chi"><div class="chmark">✓</div><div class="cht">スマートフォン横向き（landscape）で撮影</div></div>
+    <div class="chi"><div class="chmark">✓</div><div class="cht">1080p / 60fps 以上推奨</div></div>
+    <div class="chi"><div class="chmark">✓</div><div class="cht">逆光・強い影を避ける</div></div>
+    <div class="chi"><div class="chmark">✓</div><div class="cht">フォアハンド・バックハンド各5球以上</div></div>
+    <div class="chi"><div class="chmark">✓</div><div class="cht">サービスも含める場合は別途撮影</div></div>
+    <div class="chi"><div class="chmark">✓</div><div class="cht">提出はGoogle Drive共有リンクで可</div></div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section id="flow">
+  <div class="tag">How It Works</div>
+  <h2>診断から指導まで<br>4ステップ</h2>
+  <div class="fsteps">
+    <div class="fstep"><div class="fn">01</div><div class="fttl">動画提出</div><div class="fdesc">2軸動画（背面・側面）をGoogle Drive等で共有。申込フォームにリンクを記載。</div><div class="farr">→</div></div>
+    <div class="fstep"><div class="fn">02</div><div class="fttl">動作解析</div><div class="fdesc">機能解剖学の観点から関節可動域・筋連鎖・荷重パターンを科学的に分析。</div><div class="farr">→</div></div>
+    <div class="fstep"><div class="fn">03</div><div class="fttl">レポート提示</div><div class="fdesc">ロックパターン・優先課題・改善エクササイズをまとめたレポートをオンラインで解説。</div><div class="farr">→</div></div>
+    <div class="fstep"><div class="fn">04</div><div class="fttl">継続指導</div><div class="fdesc">オンライン継続コーチング、または海外キャンプ・アカデミープログラムへの接続も可能。</div></div>
+  </div>
+</section>
+
+<!-- COACH -->
+<section class="coachsec" id="coach">
+  <div class="coachin">
+    <div>
+      <div class="cbadge"><span>For Coaches &amp; Academies</span></div>
+      <div class="tag" style="margin-bottom:.8rem;">コーチ・指導者の方へ</div>
+      <h2>世界最高水準の<br>コーチング研修を<br>フランスで。</h2>
+      <div class="coachtxt">
+        <p>TPS LABのアセスメントを通じて、<strong>Mouratoglou Academy（南フランス）でのコーチング研修・海外キャンプ</strong>へのブリッジをご提供します。</p>
+        <p>Mouratoglou Methodは単なる技術指導を超え、<strong>選手の個性・身体・メンタルを統合したオーダーメイドのアプローチ</strong>。世界基準のメソッドを現地で体験できる希少な機会です。</p>
+        <p>まずはTPS LABでの診断を通じて、あなた自身またはお客様の現状を科学的に把握することから始めましょう。</p>
+      </div>
+      <div class="cctabox">
+        <p>コーチ研修・キャンプ導入に関するご相談は、Mouratoglou Internationalパートナーシップページよりお気軽にどうぞ。</p>
+        <a href="https://mouratoglou-international.github.io/mouratoglou-international/#contact" target="_blank" class="btnout">パートナーシップを相談する →</a>
+      </div>
+    </div>
+    <div class="campcards">
+      <div class="campcard">
+        <div class="camptag">Coach Education</div>
+        <div class="camptit">コーチング研修 — フランス本部</div>
+        <div class="campdesc">Mouratoglou Academy（コート・ダジュール）でのコーチ研修プログラム。メソッドの本質を現地で学び、帰国後の指導に活かす。</div>
+        <div class="campmeta"><div class="campm">期間: <span>5〜10日</span></div><div class="campm">対象: <span>コーチ・指導者</span></div></div>
+      </div>
+      <div class="campcard">
+        <div class="camptag">Player Camp</div>
+        <div class="camptit">選手向け海外キャンプ</div>
+        <div class="campdesc">TPS LABでの事前診断データを携えてフランス本部へ。個人のロックパターンに基づいた集中プログラムを受講。</div>
+        <div class="campmeta"><div class="campm">期間: <span>1〜2週間</span></div><div class="campm">対象: <span>選手（ジュニア〜社会人）</span></div></div>
+      </div>
+      <div class="campcard">
+        <div class="camptag">Academy Partnership</div>
+        <div class="camptit">アカデミー・クラブ提携</div>
+        <div class="campdesc">Mouratoglou International認定ブランドとして、日本国内でのアカデミー運営・コンテンツ展開が可能。現在パートナー評価中。</div>
+        <div class="campmeta"><div class="campm">形態: <span>ライセンス / JV</span></div><div class="campm">対象: <span>施設・クラブ運営者</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="formsec" id="assessment-form">
+  <div class="formwrap">
+    <div class="fintro">
+      <div class="tag">Apply</div>
+      <h2>オンライン診断を<br>申し込む</h2>
+      <p>動画を送るだけで、機能解剖学の専門家があなたの「ロックパターン」を特定します。まずは無料相談からどうぞ。</p>
+      <div class="pricebox">
+        <div class="pttl">診断メニュー</div>
+        <div class="prow"><span class="plbl">無料相談（30分 / オンライン）</span><span class="pval">¥0</span></div>
+        <div class="prow"><span class="plbl">初回動画診断レポート</span><span class="pval">要相談</span></div>
+        <div class="prow"><span class="plbl">継続オンラインコーチング</span><span class="pval">要相談</span></div>
+        <div class="prow"><span class="plbl">海外キャンプ接続プラン</span><span class="pval">別途案内</span></div>
+      </div>
+    </div>
+    <div class="fbox">
+      <div id="formfields">
+        <form id="contactForm" action="https://formspree.io/f/xnjrnwqa" method="POST" onsubmit="handleFormSubmit(event)">
+          <input type="hidden" name="_subject" value="TPS LAB 診断申込">
+          <input type="hidden" name="_language" value="ja">
+          <div class="frow">
+            <div class="fg"><label>お名前（姓）</label><input type="text" name="姓" placeholder="山田" required></div>
+            <div class="fg"><label>お名前（名）</label><input type="text" name="名" placeholder="太郎" required></div>
+          </div>
+          <div class="fg"><label>メールアドレス</label><input type="email" name="email" placeholder="your@email.com" required></div>
+          <div class="fg"><label>電話番号（任意）</label><input type="tel" name="電話番号" placeholder="090-0000-0000"></div>
+          <div class="fg">
+            <label>お申込み区分</label>
+            <div class="radiog">
+              <label class="ritem"><input type="radio" name="区分" value="選手本人"><span class="rlbl">選手本人（自分のパフォーマンス改善）</span></label>
+              <label class="ritem"><input type="radio" name="区分" value="保護者"><span class="rlbl">保護者（子どものパフォーマンス改善）</span></label>
+              <label class="ritem"><input type="radio" name="区分" value="コーチ・指導者"><span class="rlbl">コーチ・指導者（研修・導入検討）</span></label>
+              <label class="ritem"><input type="radio" name="区分" value="施設・クラブ運営者"><span class="rlbl">施設・クラブ運営者（パートナーシップ）</span></label>
+            </div>
+          </div>
+          <div class="fg">
+            <label>競技レベル（選手の場合）</label>
+            <select name="競技レベル">
+              <option value="">選択してください</option>
+              <option>ジュニア（12歳以下）</option>
+              <option>ジュニア（13〜18歳）</option>
+              <option>一般・社会人</option>
+              <option>大学生競技</option>
+              <option>国内ランキング保有</option>
+              <option>ATP / WTA ランキング保有</option>
+            </select>
+          </div>
+          <div class="fg"><label>現在の課題・ご相談内容</label><textarea name="相談内容" placeholder="例：サービスの威力が出ない、フォアハンドが安定しない、など。動画リンクをお持ちの方はこちらにご記入ください。"></textarea></div>
+          <button type="submit" class="subbtn">無料相談を申し込む →</button>
+          <p class="fnote">いただいた情報は厳格な機密保持のもと管理されます。3営業日以内にご連絡いたします。</p>
+        </form>
+      </div>
+      <div class="sucmsg" id="sucmsg">
+        <div class="sico">✓</div>
+        <p><strong>お申し込みありがとうございます。</strong><br>3営業日以内にメールにてご連絡いたします。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRIDGE -->
+<section class="bridge" id="bridge">
+  <div class="tag">Next Step</div>
+  <h2>さらに先へ</h2>
+  <div class="bridgein">
+    <div class="bcard feat">
+      <div class="btag">For Players &amp; Coaches</div>
+      <div class="bh">Mouratoglou Academy<br>海外プログラム</div>
+      <p class="bp">TPS LABでの診断を土台に、世界最高峰のアカデミーで本格的なトレーニングを。南フランス・コート・ダジュールのMouratoglou本部で、個別最適化されたプログラムを体験できます。</p>
+      <ul class="blist">
+        <li>コーチ研修（5〜10日）— 本部メソッドを現地習得</li>
+        <li>選手キャンプ（1〜2週間）— 事前診断データ持参で効率最大化</li>
+        <li>ジュニア長期留学プログラム</li>
+        <li>APAC地域コーディネーションはTPS LABが担当</li>
+      </ul>
+      <a href="https://mouratoglou-international.github.io/mouratoglou-international/" target="_blank" class="blink">詳細・お問い合わせ →</a>
+    </div>
+    <div class="bcard">
+      <div class="btag">For Facilities &amp; Clubs</div>
+      <div class="bh">Mouratoglou International<br>パートナーシップ</div>
+      <p class="bp">テニスクラブ、リゾート施設、インターナショナルスクール——Mouratoglou International認定ブランドとして、日本国内での展開を検討しませんか。</p>
+      <ul class="blist">
+        <li>ブランドライセンス・認定アカデミー制度</li>
+        <li>360°サポート：技術・マーケティング・運営</li>
+        <li>国際ネットワークへのアクセス</li>
+        <li>TPS LABによる科学的カリキュラム設計</li>
+      </ul>
+      <a href="https://mouratoglou-international.github.io/mouratoglou-international/#partnership" target="_blank" class="blink">パートナーシップを見る →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="display:flex;align-items:center;">
+    <img src="assets/logo.png" alt="Sport Performance Science LAB" class="foot-logo-img">
+  </div>
+  <div class="fcopy">© 2026 TPS LAB — Powered by Mouratoglou International</div>
+  <div class="flinks">
+    <a href="#top">Top</a>
+    <a href="#why">メソッド</a>
+    <a href="#coach">コーチ向け</a>
+    <a href="https://mouratoglou-international.github.io/mouratoglou-international/" target="_blank">Mouratoglou Int'l</a>
+  </div>
+</footer>
+
+<script>
+const Qs=[
+  {q:"ストロークで「力が逃げている」「回転が掛けられない」と感じることがありますか？",opts:["かなり頻繁に感じる","たまに感じる","あまり感じない","全く感じない"]},
+  {q:"長いラリーや試合終盤になると、特定の部位（腰・肩・股関節など）の重さや引っかかりを感じますか？",opts:["腰・骨盤まわり","肩・胸椎まわり","股関節・膝まわり","特に感じない"]},
+  {q:"コーチから技術的な指摘を受けても、なかなか改善しないと感じることはありますか？",opts:["よくある","たまにある","あまりない","ほとんどない"]}
+];
+const Rs=[
+  {type:"体幹ロック型",desc:"胸椎・腰椎の回旋制限が疑われます。上半身と下半身の連動が制限され、パワーロスが生じやすい状態です。詳細診断でロックの深度と部位を特定し、優先的に解除するアプローチをご提案します。"},
+  {type:"股関節ロック型",desc:"股関節の可動域制限・荷重パターンの偏りが疑われます。フットワークの質と体重移動に影響しており、特にサービスやスライドでのパフォーマンスロスが考えられます。"},
+  {type:"複合ロック型",desc:"複数の関節にまたがる連鎖的なロックが疑われます。個別対処では改善しにくいパターンです。2軸動画解析で運動連鎖全体を確認し、根本から解除する個別プランが必要です。"},
+  {type:"予防・最適化型",desc:"現時点で大きなロックは見られない可能性があります。ただし潜在的な非効率が隠れているケースも多くあります。詳細診断でさらなるパフォーマンス向上の余地を探りましょう。"}
+];
+let cur=0,ans=[];
+function renderQ(){
+  const q=Qs[cur];
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('qopts').innerHTML=q.opts.map((o,i)=>`<button class="qopt${ans[cur]===i?' sel':''}" onclick="selOpt(${i})">${o}</button>`).join('');
+  [0,1,2].forEach(i=>document.getElementById('d'+i).classList.toggle('on',i<=cur));
+  document.getElementById('qnext').disabled=ans[cur]===undefined;
+  document.getElementById('qback').style.visibility=cur===0?'hidden':'visible';
+  document.getElementById('qnext').textContent=cur===Qs.length-1?'結果を見る →':'次へ →';
+}
+function selOpt(i){ans[cur]=i;document.querySelectorAll('.qopt').forEach((b,idx)=>b.classList.toggle('sel',idx===i));document.getElementById('qnext').disabled=false;}
+function qNext(){if(ans[cur]===undefined)return;if(cur<Qs.length-1){cur++;renderQ();}else showRes();}
+function qBack(){if(cur>0){cur--;renderQ();}}
+function showRes(){
+  const s=ans.reduce((a,b)=>a+b,0);
+  const r=Rs[Math.min(Math.floor(s/2),Rs.length-1)];
+  document.getElementById('qzbody').style.display='none';
+  const el=document.getElementById('qres');el.style.display='block';
+  document.getElementById('restype').textContent=r.type;
+  document.getElementById('resdesc').textContent=r.desc;
+  [0,1,2].forEach(i=>document.getElementById('d'+i).classList.add('on'));
+}
+function doSubmit(){document.getElementById('formfields').style.display='none';document.getElementById('sucmsg').style.display='block';}
+async function handleFormSubmit(e){
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  try {
+    const res = await fetch(form.action, {method:'POST', body:data, headers:{Accept:'application/json'}});
+    if(res.ok){ document.getElementById('formfields').style.display='none'; document.getElementById('sucmsg').style.display='block'; }
+    else { alert('送信に失敗しました。お手数ですが info@m-sportperformancesciencelab.com まで直接ご連絡ください。'); }
+  } catch(err) { alert('通信エラーが発生しました。お手数ですが info@m-sportperformancesciencelab.com まで直接ご連絡ください。'); }
+}
+renderQ();
+</script>
+</body>
+</html>
