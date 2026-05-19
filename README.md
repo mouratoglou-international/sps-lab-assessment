@@ -1,4 +1,4 @@
-# TPS LAB — Sport Performance Science LAB
+# SPS LAB — Sport Performance Science LAB
 ## Assessment Page
 
 このリポジトリはTPS LABのオンラインパフォーマンス診断ページです。
